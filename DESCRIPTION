@@ -1,0 +1,21 @@
+Package: dwdaccess
+Title: Access to DWD's open data server for temperature and precipitation 
+Version: 0.0.0.9000
+Authors@R: 
+    person("Friedemann", "Brockmeyer",, "frmb@mailbox.org", role = c("aut", "cre"))
+Description: Will be filled later. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    rjson,
+    rvest,
+    sf,
+    stringr,
+    utils,
+    xml2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
