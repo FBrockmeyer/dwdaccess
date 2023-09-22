@@ -1,4 +1,4 @@
-DWD Intro
+dwdaccess, version 0.0.1
 ================
 Friedemann Brockmeyer
 
@@ -12,11 +12,11 @@ the basis of the *Raspberry Pi 3*), I also dealt with open data
 availability of weather data in Germany. A few initial efforts are shown
 below.
 
-Note, this site is not intended to share my code - mostly written in
+Note. This site is not intended to share my code - mostly written in
 *python*, *mySQL*, and *R* - to operate my weather station, and to save
 my data on a self-hosted server. At least for the moment.
 
-## The Data
+## Data
 
 As of September 22, 2023, the weather and climate data for Germany can
 be found at the [open data
@@ -29,8 +29,9 @@ tiny package called `{dwdaccess}`. The usage will be demonstrated by
 telling a little story originated from a trivial conversation I had with
 a friend at a lake on a hot summer day in August 2023.
 
-Note, beyond the scope of this project there exist other packages to
-handle data from DWD like [“rdwd”](https://bookdown.org/brry/rdwd/).
+Note. There exist other `R` packages to handle data from DWD like
+[“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the scope of
+this project.
 
 ## Installation
 
@@ -51,12 +52,12 @@ not planned yet.
 The lake we met at was the famous
 [Wannsee](https://www.openstreetmap.org/search?query=Wannsee#map=12/52.4341/13.1992).
 To retrieve the latitude and longitude coordinates of any location we
-wrote a function `address_to_lonlat()` which translates any location
-described by a character string like *Wannsee Berlin* to a numeric
-vector of longitude and latitude. To do so, the function relies on an
-API service from [Open Street Map](https://www.openstreetmap.org/). This
-allows a visualisation of any location in *RStudio* and can be
-particularly interesting for the development of a *shiny app*:
+wrote a function `address_to_lonlat()` which translates any character
+string like *Wannsee Berlin* to a numeric vector containing longitude
+and latitude. To do so, the function relies on an API service from [Open
+Street Map](https://www.openstreetmap.org/). With *RStudio* we can
+create a map for any location. Particularly interesting for the
+development of a *shiny app* (TODO).
 
 ``` r
 {
@@ -74,8 +75,9 @@ leaflet() |>
   addMiniMap(width = 150, height = 150)
 ```
 
-<div class="leaflet html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6681e2aaf04dff6a3a8e" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-6681e2aaf04dff6a3a8e">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMiniMap","args":[null,null,"bottomright",150,150,19,19,-5,false,false,false,false,false,false,{"color":"#ff7800","weight":1,"clickable":false},{"color":"#000000","weight":1,"clickable":false,"opacity":0,"fillOpacity":0},{"hideText":"Hide MiniMap","showText":"Show MiniMap"},[]]}],"flyTo":[{"latitude":52.4602925,"longitude":13.1400517},11,[]]},"evals":[],"jsHooks":[]}</script>
+Note. Afaik. The output from the *code chunk* above cannot be presented
+on github, since support for *java*-driven applications like *Leaflet*
+is missing.
 
 Besides the location of interest, we need the locations of all weather
 stations operated and affiliated by DWD to identify relevant stations
@@ -102,14 +104,13 @@ distance_between(stations = dwd_stations(),
 | 95  | 00402       | 18760101  | 19621231  |            55 | Berlin-Dahlem     | POINT (13.2997 52.4564) | 10825.689 \[m\] |
 | 96  | 00403       | 19500101  | 20230921  |            51 | Berlin-Dahlem     | POINT (13.3017 52.4537) | 10977.383 \[m\] |
 
-Note, throughout this introduction the commands `kable()` and, later,
+Note. Throughout this introduction the commands `kable()` and, later,
 `t() |> kable()` are used to style the output. `kable()` is exported
 from package
 [`{knitr}`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
-The wrapper `zip_urls()` scraps the information found under the urls of
-the following form:
-<https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/>,
-i.e.,
+The wrapper `zip_urls()` scraps the information found under links of the
+[form](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/),
+e.g.
 
 ``` r
 recent_temp <- zip_urls(
@@ -119,14 +120,13 @@ historical_temp <- zip_urls(
   link = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/")
 ```
 
-and is mainly designed to collect all available urls to *.zip*-files. A
-link for each station/id. The function is not restricted to observations
-on a hourly basis. It works with [other time intervals between
+and is mainly designed to collect all available links to *.zip*-files. A
+link for each station/id. The function is not restricted to data on a
+hourly basis. It works with [other time intervals between
 measurements](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/)
-as well.
-
-Lets store the station ids of the five closest weather stations (A) and
-check if data, i.e. links to *.zip*-files, is indeed available (B):
+as well. Let’s store the station ids of the five closest weather
+stations (A) and check if data, i.e., links to *.zip*-files, is indeed
+available (B):
 
 ``` r
 # (A)
@@ -155,7 +155,8 @@ closest stations providing data. Does the data for recent and historical
 records come from the same station?
 
 ``` r
-recent_temp[recent_temp$id %in% nearest5stations, ]$id == historical_temp[historical_temp$id %in% nearest5stations, ]$id
+recent_temp[recent_temp$id %in% nearest5stations, ]$id == 
+  historical_temp[historical_temp$id %in% nearest5stations, ]$id
 ```
 
     ## [1] TRUE
@@ -172,7 +173,8 @@ dwd_stations()[
     ##     Stationsname
     ## 848      Potsdam
 
-The weather station on the grounds of the university it is, click
+The weather station on the grounds of the university Potsdam it is,
+click
 [here](https://www.openstreetmap.org/search?whereami=1&query=52.38124%2C13.06212#map=19/52.38124/13.06212)
 to see the location. As we have now identified potential data, we
 continue with the download of recent (air) temperature (and humidity)
@@ -181,12 +183,12 @@ that is available.
 
 Note. A thorough documentation can be found
 [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/).
-A complete list of the available variables can be obtained from
+A complete list of available variables can be obtained from
 [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/).
 Note, we assume that the download function `download_data()` can also be
-used for other subfolders than *air_temperature* and *precipitation*.
+used for other sub folders than *air_temperature* and *precipitation*.
 
-The following code demonstrates the utilisation of `download_data()` to
+The below code demonstrates the utilisation of `download_data()` to
 access data from a certain weather station. The function can also be
 used to download data from several stations at once. For this, the input
 data frame `job` needs to contain several station ids. After the
@@ -194,81 +196,41 @@ download process is complete, we use several `{data.table}` functions to
 rename and modify the data in the fastest possible manner. You can
 ignore the surrounding if-clause and its purposes.
 
-``` r
-# Code in clause runs only once per R session. This is intended 
-if(exists("hasRun") == FALSE) {
-  
-  # Download weather data 
-  recent_data <- download_data(job = recent_temp[recent_temp$id %in% nearest5stations, ],
-                          cleanup = TRUE)
-  historical_data <- download_data(job = historical_temp[historical_temp$id %in% nearest5stations, ],
-                              cleanup = TRUE)
-  # Modify and rename 
-  {
-    library(data.table)
-  }
-  # Merge data sets
-  # Note. {data.table} is the fast. 
-  data <- data.table::merge.data.table(x = data.table::setDT(recent_data),
-                                       y = data.table::setDT(historical_data), 
-                                       all = TRUE)
-  # Clean-up environment 
-  rm(recent_data, historical_data)
-  
-  # Renaming
-  data <- setNames(data, 
-                   c("id", "datetime", "quality9", "temperature", "humidity", "eor"))
-  
-  # Change character variable containing date information to POSIXct (datetime)
-  data[, datetime := as.POSIXct(x = as.character(datetime), 
-                            format = "%Y%m%d%H", 
-                            origin = Sys.timezone())]
-  # Pad id with zeros; nchar == 5
-  data[, id := sprintf("%05s", id)]
-  # Replace missing values with R-like NA's in the fastest possible manner data.table provides
-  for(col in names(data)) data.table::set(data, i = which(data[[col]] == -999.000), j = col, value = NA)
-  
-  hasRun <- TRUE 
-}
-```
-
-    ## The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.
-
 The data is now downloaded, merged and prepared in a very R-like
 fashion. The time has come to do simple explanatory analysis. How many
 observations and variables did we get?
 
 ``` r
-dim(data) 
+dim(data) |> kable()
 ```
 
-    ## [1] 1145842       6
+|       x |
+|--------:|
+| 1145866 |
+|       6 |
 
 More than a million observations, and six variables, distributed over
 
 ``` r
 difftime(max(data$datetime, na.rm = TRUE), min(data$datetime, na.rm = TRUE), 
-                                         tz = Sys.timezone(), units = "days") |>kable()
+                                         tz = Sys.timezone(), units = "days") |> kable()
 ```
 
 | x             |
 |:--------------|
-| 47743.87 days |
+| 47744.87 days |
 
-roughly $\approx130.71$ years. That is the number of days $477743.87$
-divided by $365.25$. Loosely speaking, as we deal with hourly
-observations, the deviation from the maximal number:
-$47743.87*24 = 114852.88$ is negligible and certainly the result of
-carelessness in computation. More relevant is the share of observations
-with non-missing (air) temperature values:
+roughly $130.71$ years. That is the number of days $47,7743.87$ divided
+by $365.25$. Similarly relevant is the share of observations with
+non-missing (air) temperature values:
 
 ``` r
-sum(complete.cases(data$temperature)) / nrow(data)
+sum(complete.cases(data$temperature)) / nrow(data) 
 ```
 
     ## [1] 0.9999799
 
-This figure is impressively high. Quite a “dense” data set!
+This figure is impressively high.
 
 Coming back to the trivial conversation. We spoke about the extreme heat
 during these days in the middle of August 2023. One mentioned: “We have
@@ -339,9 +301,9 @@ example |>
 |:--------------|:-------|
 | 2023-08-19    | TRUE   |
 
-Note `shifted_start` is an auxiliary variable and slightly misleading in
-terms of interpretation. Due to the shift, we need to add one day to the
-date under `shifted_start`:
+Note. `shifted_start` is an auxiliary variable and slightly misleading
+in terms of interpretation. Due to the shift, we need to add one day to
+the date under `shifted_start`:
 
 ``` r
 example |>
@@ -367,8 +329,8 @@ example |>
 | 03987 | 2023-08-20 05:00:00 |        1 |        21.0 |       91 | eor | 2023 |     8 | 2023-08-20 |
 | 03987 | 2023-08-20 06:00:00 |        1 |        20.9 |       80 | eor | 2023 |     8 | 2023-08-20 |
 
-**The night previous to the day August 20, 2023 was tropical.** The guy
-was right. We have had a *tropical night* on this date.
+**The night previous to the day August 20, 2023 was tropical. He was
+right.**
 
 The [German version](https://de.wikipedia.org/wiki/Tropennacht) of the
 Wikipedia article “*Tropical night*” is interesting. Among other things,
