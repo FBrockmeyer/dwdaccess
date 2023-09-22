@@ -29,7 +29,7 @@ tiny package called `{dwdaccess}`. The usage will be demonstrated by
 telling a little story originated from a trivial conversation I had with
 a friend at a lake on a hot summer day in August 2023.
 
-Note. There exist other `R` packages to handle data from DWD like
+Note. There exist other *R* packages to handle data from DWD like
 [“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the scope of
 this project.
 
@@ -53,7 +53,7 @@ The lake we met at was the famous
 [Wannsee](https://www.openstreetmap.org/search?query=Wannsee#map=12/52.4341/13.1992).
 To retrieve the latitude and longitude coordinates of any location we
 wrote a function `address_to_lonlat()` which translates any character
-string like *Wannsee Berlin* to a numeric vector containing longitude
+string like `"Wannsee Berlin"` to a numeric vector containing longitude
 and latitude. To do so, the function relies on an API service from [Open
 Street Map](https://www.openstreetmap.org/). With *RStudio* we can
 create a map for any location. Particularly interesting for the
@@ -90,26 +90,30 @@ and the nearest weather stations in meters:
 
 ``` r
 distance_between(stations = dwd_stations(),
-                 location = address_to_lonlat(address = "Kladow Berlin")
-                 # everything followed by the closing parenthesis is for styling purposes only
-                 ) |> head() |> kable() 
+                 location = address_to_lonlat(address = "Kladow Berlin")) |>
+                 # everything from here on is for styling purposes only
+  head() |> 
+  kable(col.names = c("id", "start_date", "end_date", "stations_height", "name", "geometry", "distance")) 
 ```
 
-|     | Stations_id | von_datum | bis_datum | Stationshoehe | Stationsname      | geometry                |        distance |
-|:----|:------------|:----------|:----------|--------------:|:------------------|:------------------------|----------------:|
-| 113 | 00435       | 19640101  | 20061231  |            45 | Berlin-Zehlendorf | POINT (13.2327 52.4289) |  7184.398 \[m\] |
-| 563 | 02621       | 19560101  | 19691231  |            42 | Kleinmachnow      | POINT (13.2134 52.4045) |  7950.801 \[m\] |
-| 849 | 03988       | 18930101  | 20191231  |            81 | Potsdam           | POINT (13.0622 52.3822) | 10162.401 \[m\] |
-| 848 | 03987       | 18930101  | 20230921  |            81 | Potsdam           | POINT (13.0622 52.3812) | 10257.607 \[m\] |
-| 95  | 00402       | 18760101  | 19621231  |            55 | Berlin-Dahlem     | POINT (13.2997 52.4564) | 10825.689 \[m\] |
-| 96  | 00403       | 19500101  | 20230921  |            51 | Berlin-Dahlem     | POINT (13.3017 52.4537) | 10977.383 \[m\] |
+|     | id    | start_date | end_date | stations_height | name              | geometry                |        distance |
+|:----|:------|:-----------|:---------|----------------:|:------------------|:------------------------|----------------:|
+| 113 | 00435 | 19640101   | 20061231 |              45 | Berlin-Zehlendorf | POINT (13.2327 52.4289) |  7184.398 \[m\] |
+| 563 | 02621 | 19560101   | 19691231 |              42 | Kleinmachnow      | POINT (13.2134 52.4045) |  7950.801 \[m\] |
+| 849 | 03988 | 18930101   | 20191231 |              81 | Potsdam           | POINT (13.0622 52.3822) | 10162.401 \[m\] |
+| 848 | 03987 | 18930101   | 20230921 |              81 | Potsdam           | POINT (13.0622 52.3812) | 10257.607 \[m\] |
+| 95  | 00402 | 18760101   | 19621231 |              55 | Berlin-Dahlem     | POINT (13.2997 52.4564) | 10825.689 \[m\] |
+| 96  | 00403 | 19500101   | 20230921 |              51 | Berlin-Dahlem     | POINT (13.3017 52.4537) | 10977.383 \[m\] |
+
+<!-- https://bookdown.org/yihui/rmarkdown-cookbook/kable.html -->
 
 Note. Throughout this introduction the commands `kable()` and, later,
 `t() |> kable()` are used to style the output. `kable()` is exported
 from package
 [`{knitr}`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
-The wrapper `zip_urls()` scraps the information found under links of the
-[form](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/),
+The wrapper `zip_urls()` scraps the information found under links of
+[this
+form](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/),
 e.g.
 
 ``` r
@@ -121,12 +125,12 @@ historical_temp <- zip_urls(
 ```
 
 and is mainly designed to collect all available links to *.zip*-files. A
-link for each station/id. The function is not restricted to data on a
+link for each station/id. The function is not restricted to data on an
 hourly basis. It works with [other time intervals between
 measurements](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/)
-as well. Let’s store the station ids of the five closest weather
-stations (A) and check if data, i.e., links to *.zip*-files, is indeed
-available (B):
+as well. Let’s store the `id`s of the five closest weather stations (A)
+and check if data, i.e., links to *.zip*-files, are indeed available
+(B):
 
 ``` r
 # (A)
@@ -173,7 +177,7 @@ dwd_stations()[
     ##     Stationsname
     ## 848      Potsdam
 
-The weather station on the grounds of the university Potsdam it is,
+The weather station on the grounds of the *University of Potsdam* it is,
 click
 [here](https://www.openstreetmap.org/search?whereami=1&query=52.38124%2C13.06212#map=19/52.38124/13.06212)
 to see the location. As we have now identified potential data, we
@@ -280,10 +284,10 @@ For each day, to decide whether or not a night was tropical the routine
 considers the previous night instead of the upcoming one. This is a
 matter of definition. As a consequence, $6$ hours of July 31, 2023 need
 to be taken into account. Similarly, the filtering ends on
-`as.POSIXct("2023083106", format = "%Y%m%d%H", origin = Sys.timezone())`,
-such that the (air) temperatures on the last evening of August 2023 are
-ignored as those only influence the calculation w.r.t. September 1,
-2023. Which night was tropical?
+`"2023083106"` (`datetime` format `"%Y%m%d%H"`, meaning August 31, 2023
+at 6 a.m.), such that the (air) temperatures on the last evening of
+August 2023 are ignored as those only influence the calculation w.r.t.
+September 1, 2023. Which night was tropical?
 
 ``` r
 example |>
@@ -329,8 +333,9 @@ example |>
 | 03987 | 2023-08-20 05:00:00 |        1 |        21.0 |       91 | eor | 2023 |     8 | 2023-08-20 |
 | 03987 | 2023-08-20 06:00:00 |        1 |        20.9 |       80 | eor | 2023 |     8 | 2023-08-20 |
 
-**The night previous to the day August 20, 2023 was tropical. He was
-right.**
+All records between $6$ p.m. and $6$ a.m. are greater than $20°C$.
+**Therefore, the night previous to the day August 20, 2023 was tropical.
+He was right.**
 
 The [German version](https://de.wikipedia.org/wiki/Tropennacht) of the
 Wikipedia article “*Tropical night*” is interesting. Among other things,
@@ -359,9 +364,9 @@ example |>
 | tn20GT_total |    0 |    1 |    0 |    0 |    0 |    1 |    1 |    0 |    0 |    0 |    1 |    0 |    4 |    1 |    0 |    0 |    1 |    0 |    1 |    1 |    1 |
 
 In total $13$ *tropical nights* are recorded, resulting in an average of
-$\approx0.62$ *tropical nights* per year between 1982 and 2002. 1994 is
+$\sim 0.62$ *tropical nights* per year between 1982 and 2002. 1994 is
 striking with four occurrences. For the time period 2003-2018 the result
-look as follows:
+looks as follows:
 
 ``` r
 example |>
@@ -377,5 +382,8 @@ example |>
 | year         | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 |
 | tn20GT_total |    2 |    0 |    1 |    3 |    2 |    0 |    0 |    5 |    0 |    1 |    5 |    1 |    6 |    2 |    0 |    8 |
 
-In total $36$ *tropical nights*, resulting in an average of $2.25$
-*tropical nights* per year.
+For this span of years, $36$ *tropical nights* are recorded in total.
+The corresponding average is $2.25$ *tropical nights* per year. Eight
+*tropical nights* in 2018. My mother and grandmother regularly remind
+others of the heat of 1994. I wonder if they remember 2018 in the same
+way?
