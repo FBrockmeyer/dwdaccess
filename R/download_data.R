@@ -29,7 +29,7 @@ download_data <- function(job,
   if(cleanup) {
     if(file.exists(path)) {
       unlink(path, recursive = TRUE, force = TRUE)
-      cat(paste("The directory", path, "has been deleted."))
+      cat(paste("Disk clean-up: The directory", path, "has been deleted."))
     }
   }
   x
