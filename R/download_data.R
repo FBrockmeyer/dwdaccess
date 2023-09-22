@@ -14,15 +14,15 @@ download_data <- function(job,
   dir.create(path)
 
   lapply(job$url,
-         \(x) download.file(x, destfile = file.path(path, basename(x)), quiet = TRUE))
+         \(x) utils::download.file(x, destfile = file.path(path, basename(x)), quiet = TRUE))
 
   lapply(list.files(path = path, pattern = "\\.zip$", full.names = TRUE),
-         \(x) unzip(x, exdir = path))
+         \(x) utils::unzip(x, exdir = path))
 
   fls <- list.files(path = path, pattern = "\\.txt$", full.names = TRUE)
 
   lsjob <- lapply(fls[!grepl("Metadaten", fls)],
-                  \(x) read.table(x, fill = TRUE, header = TRUE, sep = ";"))
+                  \(x) utils::read.table(x, fill = TRUE, header = TRUE, sep = ";"))
 
   x <- do.call("rbind", lsjob)
 

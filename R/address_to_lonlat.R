@@ -18,5 +18,7 @@ address_to_lonlat <- function(address) {
   # see https://github.com/osm-search/Nominatim/issues/3134
   url <- "https://nominatim.openstreetmap.org/search?q="
   urlenc <- utils::URLencode(paste(url, address, "&format=json&limit=1"))
-  as.numeric(unlist(rjson::fromJSON(file = urlenc)[[1L]][c("lon", "lat")]))
+  x <- as.numeric(unlist(rjson::fromJSON(file = urlenc)[[1L]][c("lon", "lat")]))
+  names(x) <- c("longitude", "latitude")
+  x
 }
