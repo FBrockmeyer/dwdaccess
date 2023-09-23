@@ -12,26 +12,26 @@ the basis of the *Raspberry Pi 3*), I also dealt with open data
 availability of weather data in Germany. A few initial efforts are shown
 below.
 
-Note. This site is not intended to share my code - mostly written in
-*python*, *mySQL*, and *R* - to operate my weather station, and to save
-my data on a self-hosted server. At least for the moment.
+<tt>Note</tt>. This site is not intended to share my code - mostly
+written in *python*, *mySQL*, and *R* - to operate my weather station,
+and to save my data on a self-hosted server. At least for the moment.
 
 ## Data
 
-As of September 22, 2023, the weather and climate data for Germany can
+As of September 23, 2023, the weather and climate data for Germany can
 be found at the [open data
 server](https://opendata.dwd.de/climate_environment/CDC/) provided by
 [“Deutscher Wetterdienst”](https://www.dwd.de/EN/Home/home_node.html),
-commonly abbreviated as “*DWD*”.
+commonly abbreviated as *DWD*.
 
 To access relevant data conveniently, we wrapped simple functions in a
 tiny package called `{dwdaccess}`. The usage will be demonstrated by
 telling a little story originated from a trivial conversation I had with
 a friend at a lake on a hot summer day in August 2023.
 
-Note. There exist other *R* packages to handle data from DWD like
-[“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the scope of
-this project.
+<tt>Note</tt>. There exist other *R* packages to handle data from DWD
+like [“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the
+scope of this project.
 
 ## Installation
 
@@ -47,17 +47,17 @@ library(dwdaccess)
 The development of a full and competitive package available via CRAN is
 not planned yet.
 
-## Example: A *tropical night*
+## Example: *A tropical night*
 
 The lake we met at was the famous
 [Wannsee](https://www.openstreetmap.org/search?query=Wannsee#map=12/52.4341/13.1992).
 To retrieve the latitude and longitude coordinates of any location we
 wrote a function `address_to_lonlat()` which translates any character
 string like `"Wannsee Berlin"` to a numeric vector containing longitude
-and latitude. To do so, the function relies on an API service from [Open
-Street Map](https://www.openstreetmap.org/). With *RStudio* we can
-create a map for any location. Particularly interesting for the
-development of a *shiny app* (TODO).
+and latitude coordinates. To do so, the function relies on an API
+service from [Open Street Map](https://www.openstreetmap.org/). With
+*RStudio*’s viewer we can display the locations on a variety of maps.
+Particularly interesting for the development of a *shiny app* (TODO).
 
 ``` r
 {
@@ -75,9 +75,9 @@ leaflet() |>
   addMiniMap(width = 150, height = 150)
 ```
 
-Note. Afaik. The output from the *code chunk* above cannot be presented
-on github, since support for *java*-driven applications like *Leaflet*
-is missing.
+<tt>Note</tt>. The output from the *code chunk* above cannot be
+presented on github, since support for *java*-driven applications like
+*leaflet* is missing. Come back later to see an update.
 
 Besides the location of interest, we need the locations of all weather
 stations operated and affiliated by DWD to identify relevant stations
@@ -107,10 +107,11 @@ distance_between(stations = dwd_stations(),
 
 <!-- https://bookdown.org/yihui/rmarkdown-cookbook/kable.html -->
 
-Note. Throughout this introduction the commands `kable()` and, later,
-`t() |> kable()` are used to style the output. `kable()` is exported
-from package
+<tt>Note</tt>. Throughout this introduction the commands `kable()` and,
+later, `t() |> kable()` are used to style the output. `kable()` is
+exported from package
 [`{knitr}`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
+
 The wrapper `zip_urls()` scraps the information found under links of
 [this
 form](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/),
@@ -119,12 +120,11 @@ e.g.
 ``` r
 recent_temp <- zip_urls(
   link = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/") 
-
 historical_temp <- zip_urls(
   link = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/")
 ```
 
-and is mainly designed to collect all available links to *.zip*-files. A
+and is mainly designed to collect all links to available *.zip*-files. A
 link for each station/id. The function is not restricted to data on an
 hourly basis. It works with [other time intervals between
 measurements](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/)
@@ -137,7 +137,6 @@ and check if data, i.e., links to *.zip*-files, are indeed available
 nearest5stations <- distance_between(stations = dwd_stations(),
                                      location = address_to_lonlat(address = "Kladow Berlin")
                                      )$Stations_id[1:5]
-
 # (B)
 recent_temp[recent_temp$id %in% nearest5stations, ] |> kable()
 ```
@@ -154,7 +153,7 @@ historical_temp[historical_temp$id %in% nearest5stations, ] |> kable()
 |:----|:------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------|
 | 379 | <https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_03987_18930101_20221231_hist.zip> | 03987 |
 
-It looks like the station with `id` $03987$ is the only of the five
+It looks like the station with `id` $03987$ is the only out of the five
 closest stations providing data. Does the data for recent and historical
 records come from the same station?
 
@@ -169,13 +168,13 @@ Yes. Which station name corresponds to the `id`?
 
 ``` r
 dwd_stations()[
-  which(dwd_stations()$Stations_id == recent_temp[recent_temp$id %in% nearest5stations, ]$id), ]
+  which(dwd_stations()$Stations_id == recent_temp[recent_temp$id %in% nearest5stations, ]$id), ] |>
+  kable(col.names = c("id", "start_date", "end_date", "stations_height", "name", "geometry", "distance")) 
 ```
 
-    ##     Stations_id von_datum bis_datum Stationshoehe geoBreite geoLaenge
-    ## 848       03987  18930101  20230920            81   52.3812   13.0622
-    ##     Stationsname
-    ## 848      Potsdam
+|     | id    | start_date | end_date | stations_height |    name | geometry | distance |
+|:----|:------|:-----------|:---------|----------------:|--------:|---------:|:---------|
+| 848 | 03987 | 18930101   | 20230921 |              81 | 52.3812 |  13.0622 | Potsdam  |
 
 The weather station on the grounds of the *University of Potsdam* it is,
 click
@@ -185,12 +184,12 @@ continue with the download of recent (air) temperature (and humidity)
 data on an hourly basis. Additionally, we download all historical data
 that is available.
 
-Note. A thorough documentation can be found
+<tt>Note</tt>. A thorough documentation can be found
 [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/).
 A complete list of available variables can be obtained from
 [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/).
-Note, we assume that the download function `download_data()` can also be
-used for other sub folders than *air_temperature* and *precipitation*.
+We assume that the download function `download_data()` can also be used
+for other sub folders than *air_temperature* and *precipitation*.
 
 The below code demonstrates the utilisation of `download_data()` to
 access data from a certain weather station. The function can also be
@@ -200,7 +199,47 @@ download process is complete, we use several `{data.table}` functions to
 rename and modify the data in the fastest possible manner. You can
 ignore the surrounding if-clause and its purposes.
 
-The data is now downloaded, merged and prepared in a very R-like
+``` r
+# Code in if-clause runs only once per R session. This is intended behaviour.
+if(exists("hasRun") == FALSE) {
+  # Download weather data 
+  recent_data <- download_data(
+    job = recent_temp[recent_temp$id %in% nearest5stations, ],
+    cleanup = TRUE)
+  historical_data <- download_data(
+    job = historical_temp[historical_temp$id %in% nearest5stations, ],
+    cleanup = TRUE)
+  # Modify and rename 
+  {
+    library(data.table)
+  }
+  data <- data.table::merge.data.table(x = data.table::setDT(recent_data),
+                                       y = data.table::setDT(historical_data), 
+                                       all = TRUE)
+  # Clean-up environment 
+  rm(recent_data, historical_data)
+  # Renaming
+  data <- setNames(data, 
+                   c("id", "datetime", "quality9", 
+                     "temperature", "humidity", "eor"))
+  # Change character variable containing date information to POSIXct (datetime)
+  data[, datetime := as.POSIXct(x = as.character(datetime), 
+                            format = "%Y%m%d%H", 
+                            origin = Sys.timezone())]
+  # Pad id with zeros; nchar == 5
+  data[, id := sprintf("%05s", id)]
+  # Replace missing values with R-like NA's
+  for(col in names(data)) data.table::set(data, 
+                                          i = which(data[[col]] == -999.000), 
+                                          j = col, 
+                                          value = NA)
+  hasRun <- TRUE 
+}
+```
+
+    ## Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.
+
+The data is now downloaded, merged and prepared in a very *R*-like
 fashion. The time has come to do simple explanatory analysis. How many
 observations and variables did we get?
 
@@ -239,21 +278,22 @@ This figure is impressively high.
 Coming back to the trivial conversation. We spoke about the extreme heat
 during these days in the middle of August 2023. One mentioned: “We have
 a **tropical night**.”. *Meteorologists* define those as **nights where
-the lowest (air) temperature between 6 pm and 6 am does not fall under
-20°C** (add source). By the way, (air) temperature is commonly measured
-at a height of two meters above sea level, see, e.g. the [DWD
+the lowest (air) temperature between 6 p.m. and 6 a.m. does not fall
+under 20°C**. By the way, (air) temperature is commonly measured at a
+height of two meters above sea level, see, e.g. the [DWD
 documentation](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/DESCRIPTION_obsgermany_climate_hourly_air_temperature_en.pdf).
 We would now like to know whether he was correct in stating that.
 
 To increase comprehensibility, we switch to `{dplyr}` syntax. Although
-slower in big data applications, it is more widely used in applied
-science than `{data.table}`. First, we calculate a few more variables
-`year`, `month`, and `date` to simplify filtering (1). Second, we store
-the data under the name `example` to reduce length of code in subsequent
-`code chunks` (2). We, then, *subset* the data to get the relevant
-month: August 2023 (3). Essentially, we calculate an indicator variable
-[`tn20GT`](https://en.wikipedia.org/wiki/Tropical_night) which is `TRUE`
-if a certain night meets the definition and `FALSE` otherwise (4).
+(moderately) slower in big data applications, it is more widely used in
+applied science than `{data.table}`. First, we calculate a few more
+variables `year`, `month`, and `date` to simplify filtering (1). Second,
+we store the data under the name `example` to reduce length of code in
+subsequent `code chunks` (2). We, then, *subset* the data to get the
+relevant month: August 2023 (3). Essentially, we calculate an indicator
+variable [`tn20GT`](https://en.wikipedia.org/wiki/Tropical_night) which
+is `TRUE` if a certain night meets the definition and `FALSE` otherwise
+(4).
 
 ``` r
 library(dplyr); library(lubridate)
@@ -283,11 +323,11 @@ example |>
 For each day, to decide whether or not a night was tropical the routine
 considers the previous night instead of the upcoming one. This is a
 matter of definition. As a consequence, $6$ hours of July 31, 2023 need
-to be taken into account. Similarly, the filtering ends on
-`"2023083106"` (`datetime` format `"%Y%m%d%H"`, meaning August 31, 2023
-at 6 a.m.), such that the (air) temperatures on the last evening of
-August 2023 are ignored as those only influence the calculation w.r.t.
-September 1, 2023. Which night was tropical?
+to be taken into account. Similarly, the filtering ends on 2023-08-31
+06:00:00, meaning August 31, 2023 at 6 a.m., such that the (air)
+temperatures on the last evening of August 2023 are ignored as those
+only influence the calculation w.r.t. September 1, 2023. Which night was
+tropical?
 
 ``` r
 example |>
@@ -305,33 +345,36 @@ example |>
 |:--------------|:-------|
 | 2023-08-19    | TRUE   |
 
-Note. `shifted_start` is an auxiliary variable and slightly misleading
-in terms of interpretation. Due to the shift, we need to add one day to
-the date under `shifted_start`:
+<tt>Note</tt>. `shifted_start` is an auxiliary variable, created to
+calculate `tn20GT`, and slightly misleading in terms of interpretation.
+Due to the shift, we need to add one day to the date under
+`shifted_start`:
 
 ``` r
 example |>
   filter(year == 2023 & 
            datetime >= as.POSIXct("2023081918", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023082006", format = "%Y%m%d%H", origin = Sys.timezone())
-         ) |> kable()
+         ) |> 
+  select(id, datetime, temperature, humidity) |>
+  kable()
 ```
 
-| id    | datetime            | quality9 | temperature | humidity | eor | year | month | date       |
-|:------|:--------------------|---------:|------------:|---------:|:----|-----:|------:|:-----------|
-| 03987 | 2023-08-19 18:00:00 |        1 |        26.9 |       68 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-19 19:00:00 |        1 |        26.5 |       63 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-19 20:00:00 |        1 |        25.6 |       68 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-19 21:00:00 |        1 |        24.7 |       72 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-19 22:00:00 |        1 |        24.5 |       71 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-19 23:00:00 |        1 |        24.4 |       73 | eor | 2023 |     8 | 2023-08-19 |
-| 03987 | 2023-08-20 00:00:00 |        1 |        23.6 |       74 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 01:00:00 |        1 |        23.1 |       82 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 02:00:00 |        1 |        22.7 |       84 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 03:00:00 |        1 |        22.0 |       88 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 04:00:00 |        1 |        21.3 |       92 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 05:00:00 |        1 |        21.0 |       91 | eor | 2023 |     8 | 2023-08-20 |
-| 03987 | 2023-08-20 06:00:00 |        1 |        20.9 |       80 | eor | 2023 |     8 | 2023-08-20 |
+| id    | datetime            | temperature | humidity |
+|:------|:--------------------|------------:|---------:|
+| 03987 | 2023-08-19 18:00:00 |        26.9 |       68 |
+| 03987 | 2023-08-19 19:00:00 |        26.5 |       63 |
+| 03987 | 2023-08-19 20:00:00 |        25.6 |       68 |
+| 03987 | 2023-08-19 21:00:00 |        24.7 |       72 |
+| 03987 | 2023-08-19 22:00:00 |        24.5 |       71 |
+| 03987 | 2023-08-19 23:00:00 |        24.4 |       73 |
+| 03987 | 2023-08-20 00:00:00 |        23.6 |       74 |
+| 03987 | 2023-08-20 01:00:00 |        23.1 |       82 |
+| 03987 | 2023-08-20 02:00:00 |        22.7 |       84 |
+| 03987 | 2023-08-20 03:00:00 |        22.0 |       88 |
+| 03987 | 2023-08-20 04:00:00 |        21.3 |       92 |
+| 03987 | 2023-08-20 05:00:00 |        21.0 |       91 |
+| 03987 | 2023-08-20 06:00:00 |        20.9 |       80 |
 
 All records between $6$ p.m. and $6$ a.m. are greater than $20°C$.
 **Therefore, the night previous to the day August 20, 2023 was tropical.
@@ -382,8 +425,22 @@ example |>
 | year         | 2003 | 2004 | 2005 | 2006 | 2007 | 2008 | 2009 | 2010 | 2011 | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 |
 | tn20GT_total |    2 |    0 |    1 |    3 |    2 |    0 |    0 |    5 |    0 |    1 |    5 |    1 |    6 |    2 |    0 |    8 |
 
-For this span of years, $36$ *tropical nights* are recorded in total.
-The corresponding average is $2.25$ *tropical nights* per year. Eight
-*tropical nights* in 2018. My mother and grandmother regularly remind
-others of the heat of 1994. I wonder if they remember 2018 in the same
-way?
+For this span of years, $36$ *tropical nights* are recorded. The
+corresponding average is $2.25$. We observe eight *tropical nights* in
+2018. My mother and grandmother regularly remind others of the heat in
+1994. I wonder if they remember 2018 in the same way?
+
+``` r
+knitr::include_graphics("images/IMG_2380.png")
+```
+
+<div class="figure" style="text-align: center">
+
+<img src="images/IMG_2380.png" alt="How the author escaped the heat in 1994." width="3684" />
+<p class="caption">
+How the author escaped the heat in 1994.
+</p>
+
+</div>
+
+More to come. Come back later.
