@@ -430,10 +430,6 @@ corresponding average is $2.25$. We observe eight *tropical nights* in
 2018. My mother and grandmother regularly remind others of the heat in
 1994. I wonder if they remember 2018 in the same way?
 
-``` r
-knitr::include_graphics("images/IMG_2380.png")
-```
-
 <div class="figure" style="text-align: center">
 
 <img src="images/IMG_2380.png" alt="How the author escaped the heat in 1994." width="400px" />
