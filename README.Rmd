@@ -259,7 +259,7 @@ example |>
 For this span of years, $36$ *tropical nights* are recorded. The corresponding average is $2.25$. 
 We observe eight *tropical nights* in 2018. My mother and grandmother regularly remind others of the heat in 1994. I wonder if they remember 2018 in the same way?
 
-```{r, fig.cap = "How the author escaped the heat in 1994."}
+```{r, fig.cap = "How the author escaped the heat in 1994.", fig.align='center', out.width="400px", fig.retina = 1}
 knitr::include_graphics("images/IMG_2380.png")
 ```
 
