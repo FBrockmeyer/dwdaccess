@@ -12,13 +12,13 @@ the basis of the *Raspberry Pi 3*), I also dealt with open data
 availability of weather data in Germany. A few initial efforts are shown
 below.
 
-<tt>Note</tt>. This site is not intended to share my code - mostly
-written in *python*, *mySQL*, and *R* - to operate my weather station,
-and to save my data on a self-hosted server. At least for the moment.
+> This site is not intended to share my code - mostly written in
+> *python*, *mySQL*, and *R* - to operate my weather station, and to \>
+> save my data on a self-hosted server. At least for the moment.
 
 ## Data
 
-As of September 23, 2023, the weather and climate data for Germany can
+As of September 28, 2023, the weather and climate data for Germany can
 be found at the [open data
 server](https://opendata.dwd.de/climate_environment/CDC/) provided by
 [“Deutscher Wetterdienst”](https://www.dwd.de/EN/Home/home_node.html),
@@ -29,9 +29,9 @@ tiny package called `{dwdaccess}`. The usage will be demonstrated by
 telling a little story originated from a trivial conversation I had with
 a friend at a lake on a hot summer day in August 2023.
 
-<tt>Note</tt>. There exist other *R* packages to handle data from DWD
-like [“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the
-scope of this project.
+> There exist other *R* packages to handle data from DWD like
+> [“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the scope
+> \> of this project.
 
 ## Installation
 
@@ -39,7 +39,7 @@ One can install the development version of `{dwdaccess}` from
 [GitHub](https://github.com/FBrockmeyer/dwdaccess) with:
 
 ``` r
-# install.packages("devtools") # uncomment this if necessary 
+if(!require(devtools)) install.packages("devtools")
 devtools::install_github("FBrockmeyer/dwdaccess")
 library(dwdaccess)
 ```
@@ -75,9 +75,9 @@ leaflet() |>
   addMiniMap(width = 150, height = 150)
 ```
 
-<tt>Note</tt>. The output from the *code chunk* above cannot be
-presented on github, since support for *java*-driven applications like
-*leaflet* is missing. Come back later to see an update.
+> The output from the *code chunk* above cannot be presented on github,
+> since support for *java*-driven applications like *leaflet* \> is
+> missing. Come back later to see an update.
 
 Besides the location of interest, we need the locations of all weather
 stations operated and affiliated by DWD to identify relevant stations
@@ -107,10 +107,10 @@ distance_between(stations = dwd_stations(),
 
 <!-- https://bookdown.org/yihui/rmarkdown-cookbook/kable.html -->
 
-<tt>Note</tt>. Throughout this introduction the commands `kable()` and,
-later, `t() |> kable()` are used to style the output. `kable()` is
-exported from package
-[`{knitr}`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
+> Throughout this introduction the commands `kable()` and, later,
+> `t() |> kable()` are used to style the output. `kable()` is exported
+> from package
+> [`{knitr}`](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
 
 The wrapper `zip_urls()` scraps the information found under links of
 [this
@@ -184,12 +184,12 @@ continue with the download of recent (air) temperature (and humidity)
 data on an hourly basis. Additionally, we download all historical data
 that is available.
 
-<tt>Note</tt>. A thorough documentation can be found
-[here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/).
-A complete list of available variables can be obtained from
-[here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/).
-We assume that the download function `download_data()` can also be used
-for other sub folders than *air_temperature* and *precipitation*.
+> A thorough documentation can be found
+> [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/).
+> A complete list of available variables can be obtained from
+> [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/).
+> We assume that the download function `download_data()` can also be
+> used for other sub folders than *air_temperature* and *precipitation*.
 
 The below code demonstrates the utilisation of `download_data()` to
 access data from a certain weather station. The function can also be
@@ -219,9 +219,9 @@ if(exists("hasRun") == FALSE) {
   # Clean-up environment 
   rm(recent_data, historical_data)
   # Renaming
-  data <- setNames(data, 
-                   c("id", "datetime", "quality9", 
-                     "temperature", "humidity", "eor"))
+  data <- setNames(object = data, 
+                   nm = c("id", "datetime", "quality9", 
+                          "temperature", "humidity", "eor"))
   # Change character variable containing date information to POSIXct (datetime)
   data[, datetime := as.POSIXct(x = as.character(datetime), 
                             format = "%Y%m%d%H", 
@@ -237,7 +237,7 @@ if(exists("hasRun") == FALSE) {
 }
 ```
 
-    ## Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.
+    Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.Disk clean-up: The directory /Users/cara/Desktop/dwdaccess/temp_folder has been deleted.
 
 The data is now downloaded, merged and prepared in a very *R*-like
 fashion. The time has come to do simple explanatory analysis. How many
@@ -255,13 +255,15 @@ dim(data) |> kable()
 More than a million observations, and six variables, distributed over
 
 ``` r
-difftime(max(data$datetime, na.rm = TRUE), min(data$datetime, na.rm = TRUE), 
-                                         tz = Sys.timezone(), units = "days") |> kable()
+difftime(
+  time1 = max(data$datetime, na.rm = TRUE), 
+  time2 = min(data$datetime, na.rm = TRUE), 
+  tz = Sys.timezone(), units = "days") |> kable()
 ```
 
 | x             |
 |:--------------|
-| 47744.87 days |
+| 47749.87 days |
 
 roughly $130.71$ years. That is the number of days $47,7743.87$ divided
 by $365.25$. Similarly relevant is the share of observations with
@@ -345,10 +347,9 @@ example |>
 |:--------------|:-------|
 | 2023-08-19    | TRUE   |
 
-<tt>Note</tt>. `shifted_start` is an auxiliary variable, created to
-calculate `tn20GT`, and slightly misleading in terms of interpretation.
-Due to the shift, we need to add one day to the date under
-`shifted_start`:
+> `shifted_start` is an auxiliary variable, created to calculate
+> `tn20GT`, and slightly misleading in terms of interpretation. Due to
+> the shift, we need to add one day to the date under `shifted_start`:
 
 ``` r
 example |>
@@ -430,13 +431,315 @@ corresponding average is $2.25$. We observe eight *tropical nights* in
 2018. My mother and grandmother regularly remind others of the heat in
 1994. I wonder if they remember 2018 in the same way?
 
-<div class="figure" style="text-align: center">
+What about the recent years?
 
-<img src="images/IMG_2380.png" alt="How the author escaped the heat in 1994." width="400px" />
-<p class="caption">
-How the author escaped the heat in 1994.
-</p>
+``` r
+example |>
+  filter(year %in% 2019:2023) |>
+  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
+  summarise(tn20GT = all(temperature >= 20), .by = c(shifted_start, year)) |>
+  select(year, tn20GT) |>
+  summarise(tn20GT_total = sum(tn20GT), .by = year) |> t() |> kable()
+```
 
-</div>
+|              |      |      |      |      |      |
+|:-------------|-----:|-----:|-----:|-----:|-----:|
+| year         | 2019 | 2020 | 2021 | 2022 | 2023 |
+| tn20GT_total |    5 |    5 |    3 |    7 |    2 |
+
+The Wikipedia article I have mentioned earlier provides multiple
+definitions:
+
+- desert day $:= T_{max} \geq 35°C$,
+- hot day $:= T_{max} \geq 30°C$,
+- summer day $:= T_{max} \geq 25°C$,
+- heating day $:= T_{med} < 12°C$,
+- vegetation day $:= T_{med} \geq 5°C$,
+- frosty day $:= T_{min} < 0°C$, and
+- icy day $:= T_{max} < 0°C$, where
+
+T $:=$ temperature, max $:=$ maximum, min $:=$ minimum, and med $:=$
+median.
+
+For the given span of years, the total amount of days per year falling
+into each day category can be visualised:
+
+``` r
+library(sysfonts); library(showtext); library(ggplot2)
+font_add_google("Fuzzy Bubbles")
+showtext_auto()
+
+example2 <- data |>
+  mutate(year = lubridate::year(datetime),
+         month = lubridate::month(datetime), 
+         date = lubridate::date(datetime)) |> 
+  select(-datetime) |> 
+  summarise(max_temp = max(temperature, na.rm = TRUE), 
+         min_temp = min(temperature, na.rm = TRUE), 
+         med_temp = median(temperature, na.rm = TRUE),
+         avg_temp = mean(temperature, na.rm = TRUE), 
+         .by = c(date, year))
+
+example2 |> 
+  # https://de.wikipedia.org/wiki/Wüstentag_(Meteorologie)
+  summarise(desert_day = sum(max_temp >= 35, na.rm = TRUE), 
+            hot_day = sum(max_temp >= 30, na.rm = TRUE),
+            summer_day = sum(max_temp >= 25, na.rm = TRUE),
+            heating_day = sum(med_temp < 12, na.rm = TRUE),
+            vegetation_day = sum(med_temp >= 5, na.rm = TRUE),
+            frosty_day = sum(min_temp < 0, na.rm = TRUE),
+            icy_day = sum(max_temp < 0, na.rm = TRUE), 
+            .by = year) |> 
+  filter(!is.na(year)) |>
+  tidyr::pivot_longer(cols = -year, 
+                      names_to = "day", 
+                      values_to = "count") |>
+  
+  ggplot(aes(y = count, x = year)) +
+  geom_bar(stat = "identity") +
+  geom_smooth(stat = "smooth", method = "loess", col = "red", 
+              se = TRUE, na.rm = TRUE, linewidth = .5) +
+  facet_wrap(~factor(day, levels = 
+                       c("desert_day", "hot_day", "summer_day", 
+                         "heating_day", "vegetation_day", 
+                         "frosty_day", "icy_day")), 
+             nrow = 3, scales = "free") +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(breaks = seq(from = min(example2$year, na.rm = TRUE), 
+                                  to = max(example2$year, na.rm = TRUE), 
+                                  by = 10), 
+                     expand = c(0, 0)) +
+  labs(main = "Yearly counts of days per category.", 
+       x = "") +
+  ggthemes::theme_base() + 
+  theme(axis.text.x = element_text(angle = 90, size = 7), 
+        text = element_text(family = "Fuzzy Bubbles"))
+```
+
+<img src="man/figures/figures-1.png" style="display: block; margin: auto;" />
+
+> Note, years with missing data are cause white space inside the
+> figures.
+
+## Example: On Precipitation
+
+**Please note. More explanation will be added with future versions.**
+
+Until now, we only experimented with temperature data. We continue with
+the download of rainfall (precipitation) data available by running the
+same routine as before:
+
+``` r
+recent_rain <- zip_urls(
+  link = 
+    "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/") 
+historical_rain <- zip_urls(
+  link = 
+    "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/")
+
+## checks
+# "03987" %in% recent_rain$id
+# "03987" %in% historical_rain$id
+
+if(exists("hasRun2") == FALSE) {
+  # Download weather data 
+  recent_data <- download_data(
+    job = recent_rain[recent_rain$id == "03987", ],
+    cleanup = TRUE)
+  historical_data <- download_data(
+    job = historical_rain[historical_rain$id == "03987", ],
+    cleanup = TRUE)
+  # Modify and rename 
+  {
+    library(data.table)
+  }
+  rf <- data.table::merge.data.table(x = data.table::setDT(recent_data),
+                                     y = data.table::setDT(historical_data), 
+                                     all = TRUE)
+  # Clean-up environment 
+  rm(recent_data, historical_data)
+  
+  # Renaming
+  rf <- rf[, c("STATIONS_ID", "MESS_DATUM", "QN_8", "R1")]
+  rf <- setNames(object = rf, 
+                 nm = c("id", "datetime", 
+                        "quality8", "precipitation"))
+  # Change character variable containing date information to POSIXct (datetime)
+  rf[, datetime := as.POSIXct(x = as.character(datetime), 
+                              format = "%Y%m%d%H", 
+                              origin = Sys.timezone())]
+  # Pad id with zeros; nchar == 5
+  rf[, id := sprintf("%05s", id)]
+  # Replace missing values with R-like NA's
+  for(col in names(rf)) data.table::set(rf, 
+                                        i = which(rf[[col]] == -999.000), 
+                                        j = col, 
+                                        value = NA)
+  hasRun2 <- TRUE 
+}
+```
+
+What did we get?
+
+``` r
+rf |> head() |> kable()
+```
+
+| id    | datetime            | quality8 | precipitation |
+|:------|:--------------------|---------:|--------------:|
+| 03987 | 1995-09-01 00:00:00 |        1 |           1.3 |
+| 03987 | 1995-09-01 01:00:00 |        1 |           1.7 |
+| 03987 | 1995-09-01 02:00:00 |        1 |           0.5 |
+| 03987 | 1995-09-01 03:00:00 |        1 |           0.5 |
+| 03987 | 1995-09-01 04:00:00 |        1 |           0.9 |
+| 03987 | 1995-09-01 05:00:00 |        1 |           1.1 |
+
+``` r
+min(rf$datetime, na.rm = TRUE); max(rf$datetime, na.rm = TRUE)
+```
+
+    ## [1] "1995-09-01 CEST"
+
+    ## [1] "2023-09-27 23:00:00 CEST"
+
+``` r
+dim(data) |> kable()
+```
+
+|       x |
+|--------:|
+| 1146010 |
+|       6 |
+
+Visualising the last ten years by means of *monthly accumulated
+rainfall* (`monthly_rainfall`):
+
+``` r
+rf |>
+  mutate(year = lubridate::year(datetime),
+         month = lubridate::month(datetime)) |>
+  select(-datetime) |> 
+  summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE), 
+            .by = c(year, month)) |>
+  filter(!is.na(year) & year %in% 2013L:2022L) |>
+  
+  ggplot(aes(x = month, y = monthly_rainfall)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  facet_wrap(~factor(year, levels = 2022L:2013L), 
+             scales = "free", ncol = 3L) +
+  scale_x_continuous(breaks = 1L:12L,
+                     labels = c('Jan', 'Feb', 'Mar', 
+                                'Apr', 'May', 'Jun', 
+                                'Jul', 'Aug', 'Sep', 
+                                'Oct', 'Nov', 'Dez'), 
+                     expand = c(0L, 0L)) +
+  scale_y_continuous(expand = c(0L, 0L)) +
+  labs(y = expression(paste("rainfall in ", frac(mm, month))),
+       x = "") +
+  ggthemes::theme_base() + 
+  theme(axis.text.x = element_text(angle = 90L, size = 7L))
+```
+
+<img src="man/figures/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
+
+> Note. As there arise errors when
+> `text = element_text(family = "Fuzzy Bubbles")` is added to `theme()`,
+> this line is currently not used to style the figures with a fancy
+> font.
+
+Extracting the years with minimal and maximal amounts of *rainfall*:
+
+``` r
+rf |>
+  mutate(year = lubridate::year(datetime),
+         month = lubridate::month(datetime)) |>
+  select(-datetime) |> 
+  summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE), 
+            .by = c(year, month)) |>
+  filter(!is.na(year) & year >= 2010) |>
+  summarise(yearly_rainfall = sum(monthly_rainfall), .by = year) |>
+  arrange(desc(yearly_rainfall)) |> kable()
+```
+
+| year | yearly_rainfall |
+|-----:|----------------:|
+| 2017 |           745.8 |
+| 2013 |           682.1 |
+| 2010 |           647.8 |
+| 2021 |           612.3 |
+| 2012 |           606.5 |
+| 2011 |           606.4 |
+| 2015 |           565.4 |
+| 2014 |           541.4 |
+| 2019 |           540.3 |
+| 2016 |           503.7 |
+| 2020 |           498.7 |
+| 2023 |           484.1 |
+| 2022 |           404.5 |
+| 2018 |           345.7 |
+
+Interesting! The wettest year is followed by the most driest one.
+
+### Arranging climograph for the most and less rainy years
+
+Data handling: filtering and merging accordingly.
+
+``` r
+x <- rf |>
+  mutate(year = lubridate::year(datetime),
+         month = lubridate::month(datetime)) |>
+  filter(year %in% 2017:2018)
+
+y <- data |>
+  mutate(year = lubridate::year(datetime),
+         month = lubridate::month(datetime)) |>
+  filter(year %in% 2017:2018)
+
+xy <- data.table::merge.data.table(x = x[, -"quality8"], 
+                                   y = y[, c("datetime", "temperature", "humidity")], 
+                                   by = "datetime")
+```
+
+Build a plot with two y-axis: on the left *monthly amount of rainfall*,
+and on the right *average monthly temperature*.
+
+``` r
+climograph_data <- 
+  xy |>
+  select(-datetime) |>
+  summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE),
+            monthly_avg_temp = mean(temperature, na.rm = TRUE),
+            .by = c(year, month)) 
+
+ylim_1st <- c(0L, 220L)  
+ylim_2nd <- c(-2L, 23L)  
+b <- diff(ylim_1st) / diff(ylim_2nd)
+a <- ylim_1st[[1L]] - b * ylim_2nd[[1L]]
+
+climograph_data |>
+  ggplot(aes(x = month, y = monthly_rainfall)) +
+  geom_col(fill = "lightblue") +
+  geom_text(aes(label = monthly_rainfall), vjust = -.25, size = 3L) +
+  geom_point(aes(y = a + monthly_avg_temp * b), shape = 15L, col = "red", size = 2L) +
+  geom_text(aes(y = a + monthly_avg_temp * b, label = round(x = monthly_avg_temp, digits = 1L)), 
+            col = "red", size = 3L, hjust = .8, vjust = -1L) +
+  geom_line(aes(y = a + monthly_avg_temp * b), col = "red") +
+  facet_wrap(vars(factor(year))) +
+  scale_y_continuous(name = "precipitation [mm]", 
+                     sec.axis = sec_axis(~ (. - a) / b, name = "temperature [°C]")) +
+  scale_x_continuous(breaks = 1L:12L,
+                     labels = c('Jan', 'Feb', 'Mar', 
+                                'Apr', 'May', 'Jun', 
+                                'Jul', 'Aug', 'Sep', 
+                                'Oct', 'Nov', 'Dez')) +
+  labs(title = "Climograph", subtitle = "for Potsdam", x = "") +
+  ggthemes::theme_base() + 
+  theme(axis.text.x = element_text(angle = 90L, size = 7L))
+```
+
+<img src="man/figures/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+\>Note again. As there arise errors when
+`text = element_text(family = "Fuzzy Bubbles")` is added to `theme()`,
+this line is currently not used to style the figures with a fancy font.
 
 More to come. Come back later.
