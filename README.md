@@ -75,8 +75,8 @@ leaflet() |>
   addMiniMap(width = 150L, height = 150L)
 ```
 
-> The output from the *code chunk* above cannot be presented on github,
-> since support for *java*-driven applications like *leaflet* \> is
+> The output from the *code chunk* above cannot be presented on Github,
+> since support for *java*-driven applications like *leaflet* is still
 > missing. Come back later to see an update.
 
 Besides the location of interest, we need the locations of all weather
@@ -334,7 +334,7 @@ tropical?
 ``` r
 example |>
   filter(year == 2023L & 
-           # read "2023073118" as 6 p.m. on July 30, 2023 
+           # read "2023073118" as July 30, 2023 at 6 p.m. 
            datetime >= as.POSIXct("2023073118", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023083106", format = "%Y%m%d%H", origin = Sys.timezone())
          ) |>
@@ -471,7 +471,7 @@ T $:=$ temperature, max $:=$ maximum, min $:=$ minimum, and med $:=$
 median.
 
 For the given span of years, the total amount of days per year falling
-into each day category can be visualised:
+into each day category can be visualised by
 
 ``` r
 library(sysfonts); library(showtext); library(ggplot2)
@@ -556,14 +556,10 @@ if(exists("hasRun2") == FALSE) {
   historical_data <- download_data(
     job = historical_rain[historical_rain$id == "03987", ],
     cleanup = TRUE)
-  {
-    library(data.table)
-  }
   rf <- data.table::merge.data.table(x = data.table::setDT(recent_data),
                                      y = data.table::setDT(historical_data), 
                                      all = TRUE)
   rm(recent_data, historical_data)
-  
   # Renaming (modified)
   rf <- rf[, c("STATIONS_ID", "MESS_DATUM", "QN_8", "R1")]
   rf <- setNames(object = rf, 
@@ -605,13 +601,13 @@ min(rf$datetime, na.rm = TRUE); max(rf$datetime, na.rm = TRUE)
     ## [1] "2023-09-27 23:00:00 CEST"
 
 ``` r
-dim(data) |> kable()
+dim(rf) |> kable()
 ```
 
-|       x |
-|--------:|
-| 1146010 |
-|       6 |
+|      x |
+|-------:|
+| 244597 |
+|      4 |
 
 Visualising the last ten years by means of *monthly accumulated
 rainfall* (`monthly_rainfall`):
@@ -659,7 +655,8 @@ rf |>
   summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE), 
             .by = c(year, month)) |>
   filter(!is.na(year) & year >= 2010L) |>
-  summarise(yearly_rainfall = sum(monthly_rainfall), .by = year) |>
+  summarise(yearly_rainfall = sum(monthly_rainfall), 
+            .by = year) |>
   arrange(desc(yearly_rainfall)) |> kable()
 ```
 
@@ -702,8 +699,8 @@ xy <- data.table::merge.data.table(x = x[, -"quality8"],
                                    by = "datetime")
 ```
 
-Build a plot with two y-axis: on the left *monthly amount of rainfall*,
-and on the right *average monthly temperature*.
+Build a plot with two y-axes. Left: *monthly amount of rainfall*; right:
+*average monthly temperature*.
 
 ``` r
 climograph_data <- 

@@ -67,7 +67,7 @@ leaflet() |>
   addMiniMap(width = 150L, height = 150L)
 ```
 
-> The output from the *code chunk* above cannot be presented on github, since support for *java*-driven applications like *leaflet* > is missing. Come back later to see an update.  
+> The output from the *code chunk* above cannot be presented on Github, since support for *java*-driven applications like *leaflet* is still missing. Come back later to see an update.  
 
 Besides the location of interest, we need the locations of all weather stations operated and affiliated by DWD to identify relevant stations close by. The function `dwd_stations()` returns a list of weather stations. The list is on-line available, click [here](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/KL_Tageswerte_Beschreibung_Stationen.txt). Finally, with `distance_between()` we are able to calculate the distance between the inserted location, *Kladow*, a village situated on the lake, and the nearest weather stations in meters: 
 
@@ -215,7 +215,7 @@ For each day, to decide whether or not a night was tropical the routine consider
 ```{r ex1_continued7, echo = TRUE}
 example |>
   filter(year == 2023L & 
-           # read "2023073118" as 6 p.m. on July 30, 2023 
+           # read "2023073118" as July 30, 2023 at 6 p.m. 
            datetime >= as.POSIXct("2023073118", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023083106", format = "%Y%m%d%H", origin = Sys.timezone())
          ) |>
@@ -290,7 +290,7 @@ The Wikipedia article I have mentioned earlier provides multiple definitions:
 
 T $:=$ temperature, max $:=$ maximum, min $:=$ minimum, and med $:=$ median. 
 
-For the given span of years, the total amount of days per year falling into each day category can be visualised: 
+For the given span of years, the total amount of days per year falling into each day category can be visualised by  
 
 ```{r figures, fig.asp = 1.25}
 library(sysfonts); library(showtext); library(ggplot2)
@@ -372,14 +372,10 @@ if(exists("hasRun2") == FALSE) {
   historical_data <- download_data(
     job = historical_rain[historical_rain$id == "03987", ],
     cleanup = TRUE)
-  {
-    library(data.table)
-  }
   rf <- data.table::merge.data.table(x = data.table::setDT(recent_data),
                                      y = data.table::setDT(historical_data), 
                                      all = TRUE)
   rm(recent_data, historical_data)
-  
   # Renaming (modified)
   rf <- rf[, c("STATIONS_ID", "MESS_DATUM", "QN_8", "R1")]
   rf <- setNames(object = rf, 
@@ -402,8 +398,9 @@ What did we get?
 ```{r}
 rf |> head() |> kable()
 min(rf$datetime, na.rm = TRUE); max(rf$datetime, na.rm = TRUE)
-dim(data) |> kable()
+dim(rf) |> kable()
 ```
+
 Visualising the last ten years by means of *monthly accumulated rainfall* (`monthly_rainfall`):
 
 ```{r, fig.asp = 1.5}
@@ -444,7 +441,8 @@ rf |>
   summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE), 
             .by = c(year, month)) |>
   filter(!is.na(year) & year >= 2010L) |>
-  summarise(yearly_rainfall = sum(monthly_rainfall), .by = year) |>
+  summarise(yearly_rainfall = sum(monthly_rainfall), 
+            .by = year) |>
   arrange(desc(yearly_rainfall)) |> kable()
 ```
 
@@ -470,7 +468,7 @@ xy <- data.table::merge.data.table(x = x[, -"quality8"],
                                    by = "datetime")
 ```
 
-Build a plot with two y-axis: on the left *monthly amount of rainfall*, and on the right *average monthly temperature*.
+Build a plot with two y-axes. Left: *monthly amount of rainfall*; right: *average monthly temperature*.
 
 ```{r, fig.asp = 1.25}
 climograph_data <- 
