@@ -72,7 +72,7 @@ leaflet() |>
   flyTo(lng = kladow["longitude"],
         lat = kladow["latitude"], 
         zoom = 11) |>
-  addMiniMap(width = 150, height = 150)
+  addMiniMap(width = 150L, height = 150L)
 ```
 
 > The output from the *code chunk* above cannot be presented on github,
@@ -136,7 +136,7 @@ and check if data, i.e., links to *.zip*-files, are indeed available
 # (A)
 nearest5stations <- distance_between(stations = dwd_stations(),
                                      location = address_to_lonlat(address = "Kladow Berlin")
-                                     )$Stations_id[1:5]
+                                     )$Stations_id[1L:5L]
 # (B)
 recent_temp[recent_temp$id %in% nearest5stations, ] |> kable()
 ```
@@ -306,14 +306,14 @@ example <- data |>
          date = lubridate::date(datetime)) 
 # (3)
 example |>
-  filter(year == 2023 & 
+  filter(year == 2023L & 
            datetime >= as.POSIXct("2023073118", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023083106", format = "%Y%m%d%H", origin = Sys.timezone())
          ) |>
 # (4)
   # shifted time ranges 
   mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
-  summarise(tn20GT = all(temperature >= 20), .by = shifted_start) |>
+  summarise(tn20GT = all(temperature >= 20L), .by = shifted_start) |>
   count(tn20GT) |> kable()
 ```
 
@@ -333,14 +333,14 @@ tropical?
 
 ``` r
 example |>
-  filter(year == 2023 & 
+  filter(year == 2023L & 
            # read "2023073118" as 6 p.m. on July 30, 2023 
            datetime >= as.POSIXct("2023073118", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023083106", format = "%Y%m%d%H", origin = Sys.timezone())
          ) |>
   mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
-  summarise(tn20GT = all(temperature >= 20), .by = shifted_start) |>
-  filter(tn20GT == 1) |> kable()
+  summarise(tn20GT = all(temperature >= 20L), .by = shifted_start) |>
+  filter(tn20GT == 1L) |> kable()
 ```
 
 | shifted_start | tn20GT |
@@ -353,7 +353,7 @@ example |>
 
 ``` r
 example |>
-  filter(year == 2023 & 
+  filter(year == 2023L & 
            datetime >= as.POSIXct("2023081918", format = "%Y%m%d%H", origin = Sys.timezone()) & 
            datetime <= as.POSIXct("2023082006", format = "%Y%m%d%H", origin = Sys.timezone())
          ) |> 
@@ -395,9 +395,9 @@ calculates those numbers for the weather station located in *Potsdam*:
 
 ``` r
 example |>
-  filter(year %in% 1982:2002) |>
-  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
-  summarise(tn20GT = all(temperature >= 20), .by = c(shifted_start, year)) |>
+  filter(year %in% 1982L:2002L) |>
+  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18L))) |>
+  summarise(tn20GT = all(temperature >= 20L), .by = c(shifted_start, year)) |>
   select(year, tn20GT) |>
   summarise(tn20GT_total = sum(tn20GT), .by = year) |> t() |> kable()
 ```
@@ -414,9 +414,9 @@ looks as follows:
 
 ``` r
 example |>
-  filter(year %in% 2003:2018) |>
-  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
-  summarise(tn20GT = all(temperature >= 20), .by = c(shifted_start, year)) |>
+  filter(year %in% 2003L:2018L) |>
+  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18L))) |>
+  summarise(tn20GT = all(temperature >= 20L), .by = c(shifted_start, year)) |>
   select(year, tn20GT) |>
   summarise(tn20GT_total = sum(tn20GT), .by = year) |> t() |> kable()
 ```
@@ -431,13 +431,22 @@ corresponding average is $2.25$. We observe eight *tropical nights* in
 2018. My mother and grandmother regularly remind others of the heat in
 1994. I wonder if they remember 2018 in the same way?
 
+<div class="figure" style="text-align: center">
+
+<img src="images/IMG_2380.png" alt="How the author escaped the heat in 1994." width="3684" />
+<p class="caption">
+How the author escaped the heat in 1994.
+</p>
+
+</div>
+
 What about the recent years?
 
 ``` r
 example |>
-  filter(year %in% 2019:2023) |>
-  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18))) |>
-  summarise(tn20GT = all(temperature >= 20), .by = c(shifted_start, year)) |>
+  filter(year %in% 2019L:2023L) |>
+  mutate(shifted_start = lubridate::as_date(datetime - lubridate::hours(18L))) |>
+  summarise(tn20GT = all(temperature >= 20L), .by = c(shifted_start, year)) |>
   select(year, tn20GT) |>
   summarise(tn20GT_total = sum(tn20GT), .by = year) |> t() |> kable()
 ```
@@ -482,13 +491,13 @@ example2 <- data |>
 
 example2 |> 
   # https://de.wikipedia.org/wiki/Wüstentag_(Meteorologie)
-  summarise(desert_day = sum(max_temp >= 35, na.rm = TRUE), 
-            hot_day = sum(max_temp >= 30, na.rm = TRUE),
-            summer_day = sum(max_temp >= 25, na.rm = TRUE),
-            heating_day = sum(med_temp < 12, na.rm = TRUE),
-            vegetation_day = sum(med_temp >= 5, na.rm = TRUE),
-            frosty_day = sum(min_temp < 0, na.rm = TRUE),
-            icy_day = sum(max_temp < 0, na.rm = TRUE), 
+  summarise(desert_day = sum(max_temp >= 35L, na.rm = TRUE), 
+            hot_day = sum(max_temp >= 30L, na.rm = TRUE),
+            summer_day = sum(max_temp >= 25L, na.rm = TRUE),
+            heating_day = sum(med_temp < 12L, na.rm = TRUE),
+            vegetation_day = sum(med_temp >= 5L, na.rm = TRUE),
+            frosty_day = sum(min_temp < 0L, na.rm = TRUE),
+            icy_day = sum(max_temp < 0L, na.rm = TRUE), 
             .by = year) |> 
   filter(!is.na(year)) |>
   tidyr::pivot_longer(cols = -year, 
@@ -503,16 +512,16 @@ example2 |>
                        c("desert_day", "hot_day", "summer_day", 
                          "heating_day", "vegetation_day", 
                          "frosty_day", "icy_day")), 
-             nrow = 3, scales = "free") +
-  scale_y_continuous(expand = c(0, 0)) +
+             nrow = 3L, scales = "free") +
+  scale_y_continuous(expand = c(0L, 0L)) +
   scale_x_continuous(breaks = seq(from = min(example2$year, na.rm = TRUE), 
                                   to = max(example2$year, na.rm = TRUE), 
-                                  by = 10), 
-                     expand = c(0, 0)) +
+                                  by = 10L), 
+                     expand = c(0L, 0L)) +
   labs(main = "Yearly counts of days per category.", 
        x = "") +
   ggthemes::theme_base() + 
-  theme(axis.text.x = element_text(angle = 90, size = 7), 
+  theme(axis.text.x = element_text(angle = 90L, size = 7L), 
         text = element_text(family = "Fuzzy Bubbles"))
 ```
 
@@ -649,7 +658,7 @@ rf |>
   select(-datetime) |> 
   summarise(monthly_rainfall = sum(precipitation, na.rm = TRUE), 
             .by = c(year, month)) |>
-  filter(!is.na(year) & year >= 2010) |>
+  filter(!is.na(year) & year >= 2010L) |>
   summarise(yearly_rainfall = sum(monthly_rainfall), .by = year) |>
   arrange(desc(yearly_rainfall)) |> kable()
 ```
@@ -681,12 +690,12 @@ Data handling: filtering and merging accordingly.
 x <- rf |>
   mutate(year = lubridate::year(datetime),
          month = lubridate::month(datetime)) |>
-  filter(year %in% 2017:2018)
+  filter(year %in% 2017L:2018L)
 
 y <- data |>
   mutate(year = lubridate::year(datetime),
          month = lubridate::month(datetime)) |>
-  filter(year %in% 2017:2018)
+  filter(year %in% 2017L:2018L)
 
 xy <- data.table::merge.data.table(x = x[, -"quality8"], 
                                    y = y[, c("datetime", "temperature", "humidity")], 
