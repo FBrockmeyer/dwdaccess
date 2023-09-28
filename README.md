@@ -518,10 +518,9 @@ example2 |>
 
 <img src="man/figures/figures-1.png" style="display: block; margin: auto;" />
 
-> Note, years with missing data are cause white space inside the
-> figures.
+> Note, years with missing data cause white space inside the figures.
 
-## Example: On Precipitation
+## Example: *On Precipitation*
 
 **Please note. More explanation will be added with future versions.**
 
@@ -542,35 +541,29 @@ historical_rain <- zip_urls(
 # "03987" %in% historical_rain$id
 
 if(exists("hasRun2") == FALSE) {
-  # Download weather data 
   recent_data <- download_data(
     job = recent_rain[recent_rain$id == "03987", ],
     cleanup = TRUE)
   historical_data <- download_data(
     job = historical_rain[historical_rain$id == "03987", ],
     cleanup = TRUE)
-  # Modify and rename 
   {
     library(data.table)
   }
   rf <- data.table::merge.data.table(x = data.table::setDT(recent_data),
                                      y = data.table::setDT(historical_data), 
                                      all = TRUE)
-  # Clean-up environment 
   rm(recent_data, historical_data)
   
-  # Renaming
+  # Renaming (modified)
   rf <- rf[, c("STATIONS_ID", "MESS_DATUM", "QN_8", "R1")]
   rf <- setNames(object = rf, 
                  nm = c("id", "datetime", 
                         "quality8", "precipitation"))
-  # Change character variable containing date information to POSIXct (datetime)
   rf[, datetime := as.POSIXct(x = as.character(datetime), 
                               format = "%Y%m%d%H", 
                               origin = Sys.timezone())]
-  # Pad id with zeros; nchar == 5
   rf[, id := sprintf("%05s", id)]
-  # Replace missing values with R-like NA's
   for(col in names(rf)) data.table::set(rf, 
                                         i = which(rf[[col]] == -999.000), 
                                         j = col, 
@@ -728,18 +721,19 @@ climograph_data |>
   scale_y_continuous(name = "precipitation [mm]", 
                      sec.axis = sec_axis(~ (. - a) / b, name = "temperature [°C]")) +
   scale_x_continuous(breaks = 1L:12L,
-                     labels = c('Jan', 'Feb', 'Mar', 
-                                'Apr', 'May', 'Jun', 
-                                'Jul', 'Aug', 'Sep', 
-                                'Oct', 'Nov', 'Dez')) +
+                     labels = 
+                       c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dez')) +
   labs(title = "Climograph", subtitle = "for Potsdam", x = "") +
   ggthemes::theme_base() + 
   theme(axis.text.x = element_text(angle = 90L, size = 7L))
 ```
 
 <img src="man/figures/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
-\>Note again. As there arise errors when
-`text = element_text(family = "Fuzzy Bubbles")` is added to `theme()`,
-this line is currently not used to style the figures with a fancy font.
+
+> Note again. As there arise errors when
+> `text = element_text(family = "Fuzzy Bubbles")` is added to `theme()`,
+> this line is currently not used to style the figures with a fancy
+> font.
 
 More to come. Come back later.

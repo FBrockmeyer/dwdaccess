@@ -345,9 +345,9 @@ example2 |>
 ```
 
 
->Note, years with missing data are cause white space inside the figures. 
+>Note, years with missing data cause white space inside the figures. 
 
-## Example: On Precipitation 
+## Example: *On Precipitation*
 
 **Please note. More explanation will be added with future versions.**
 
@@ -485,9 +485,6 @@ ylim_2nd <- c(-2L, 23L)
 b <- diff(ylim_1st) / diff(ylim_2nd)
 a <- ylim_1st[[1L]] - b * ylim_2nd[[1L]]
 
-month_lables <- c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dez')
-
 climograph_data |>
   ggplot(aes(x = month, y = monthly_rainfall)) +
   geom_col(fill = "lightblue") +
@@ -500,11 +497,14 @@ climograph_data |>
   scale_y_continuous(name = "precipitation [mm]", 
                      sec.axis = sec_axis(~ (. - a) / b, name = "temperature [°C]")) +
   scale_x_continuous(breaks = 1L:12L,
-                     labels = month_labels) +
+                     labels = 
+                       c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dez')) +
   labs(title = "Climograph", subtitle = "for Potsdam", x = "") +
   ggthemes::theme_base() + 
   theme(axis.text.x = element_text(angle = 90L, size = 7L))
 ```
+
 >Note again. As there arise errors when `text = element_text(family = "Fuzzy Bubbles")` is added to `theme()`, this line is currently not used to style the figures with a fancy font.  
 
 More to come. Come back later. 
