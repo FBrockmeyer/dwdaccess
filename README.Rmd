@@ -504,24 +504,26 @@ climograph_data |>
 
 >Note again. As there arises an error when `text = element_text(family = "Fuzzy Bubbles")` is added as argument to `theme()`, this line is currently not used to style the figures with a fancy font.  
 
-### Example *Rare Events* - Diggging into *Extreme Value Theory*
+## Example *Rare Events* - Diggging into *Extreme Value Theory*
 
-Some days ago, I read on https://stackoverflow.com/questions/tagged/r about the *Gompertz distribution* and later that on that evening about *extreme value theory*, in particular about *generalized extreme value distribution*. For some reason I decided to mimic Wikipedia's *cumulative probability distribution plot* of the *Gumpel distribution*, see [`see`](https://en.wikipedia.org/wiki/Gumbel_distribution). Here is the plot generating code I came up with:
+Some days ago, I read on https://stackoverflow.com/questions/tagged/r about the *Gompertz* distribution and later that day about *extreme value theory*, in particular about the *generalized extreme value distribution*. For some reason, I decided to mimic the *cumulative probability distribution plot* given in the Wikipedia article [*Gumpel distribution*](https://en.wikipedia.org/wiki/Gumbel_distribution). Here is the plot generating code I came up with.
 
 ```{r}
-## Gumpel 
+# Gumpel, cumulative distribution function (cdf) 
 dgumpel <- function(x, mu, beta) {
   # mu = location; beta = scale 
   stopifnot(beta > 0L)
   exp( - exp(- (x - mu) / beta) )
 }
 
-colours <- c("red", "green", "blue", "lightblue")
+# define the colour scheme
+colours <- c("red", "green", "blue", "turquoise")
 
+# set of parameter values
 param_combinations <- data.frame(mu = c(.5, 1L, 1.5, 3L),
                                  beta = c(2L, 2L, 3L, 4L)
                                  )
-
+# invisble() prevents a cluttered console 
 invisible(x = 
             lapply(X = 1L:nrow(param_combinations), 
                    FUN = \(j) with(
@@ -532,22 +534,28 @@ invisible(x =
                                   ylim = c(0L:1L), 
                                   add = j!=1L, 
                                   lwd = 2L, 
-                                  xlab = "", ylab = "", 
+                                  xlab = "", ylab = "", yaxt = "n",
                                   main = substitute(paste(bold("Cumulative Distribution Function"))),
-                                  # https://stackoverflow.com/questions/12300622/remove-spacing-around-plotting-area-in-r
+                                  # reduce box margins around limits 
                                   xaxs = "i", yaxs  ="i")
                      )
                    )
           )
-axis(side = 3, labels = FALSE); axis(side = 4, labels = FALSE)
+axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2)
+axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE)
 legend(x = "bottomright", 
        legend = unlist(lapply(X = 1L:nrow(param_combinations), FUN = \(j) 
-                              paste0("mu=", param_combinations[j, "mu"], 
-                                     ", beta=", param_combinations[j, "beta"]))),
+                              paste0("F(x, mu=", param_combinations[j, "mu"],
+                                     ", beta=", param_combinations[j, "beta"], ")")
+                              )
+                       ),
        col = colours, lwd = 2L, bty = "n")
+
+
+
 ```
-TODO: ADD TEXT 
-In the application paragraph of the mentioned Wikipedia article an example concerning maximum one-day October rainfalls is given. TODO: ADD TEXT AND MOTIVATION Get data for *annual maximum one-day rainfall (amodrf)* :
+
+In the application paragraph of the mentioned Wikipedia article an example is given which deals with maximum one-day October rainfall. Based on maximum likelihood estimation of parameters a distribution fitting is performed. Based on  *annual maximum one-day rainfall (amodrf)* values, we redo the fitting process. Extracting the relevant data: 
 
 ```{r}
 amodr_data <-
@@ -562,7 +570,7 @@ amodr_data <-
   na.omit()
 ```
 
-You may want to copy the data to clipboard: 
+We get $29$ records, one for each year in $1995-2023$. You may want to copy the data to clipboard. 
 ```{r}
 data <- structure(
   list(
@@ -579,7 +587,7 @@ data <- structure(
   class = "data.frame")
 ```
 
-TODO: ADD TEXT
+First, we calculate and plot the *empirical cumulative distribution function* (ecdf), a step function by its very definition. Second, we use `EnvStats::eevd()` to execute a *maximum likelihood estimation* (MLE) of the parameters, see the help page for details. We, then, add the *estimated cumulative distribution function* to the plot. Finally, we extend by $95%$-confidence bands. 
 
 ```{r, fig.keep = 'low'}
 # annual maximum one-day rainfall
@@ -613,7 +621,8 @@ invisible(x = lapply( # prevents cluttered console
 )
 ```
 
-TODO: ADD TEXT
+**I will add all statistical details with a future version.**
+
 There exist several concepts to visually compare an *empirical cumulative distribution function* with it's theoretical counterpart. In the following, we create a so-called *P-P plot* (p $=$ probability): 
 
 ```{r}
@@ -627,7 +636,7 @@ plot(y = ecdf(amodr_data$amodr)(amodr_data$amodr),
 abline(a = 0, b = 1)
 ```
 
-Application/interpretation is vague.
+Application/interpretation of *P-P plots* is vague, especially if theory is compared to real data. 
 
 More to come. Come back later. 
 
