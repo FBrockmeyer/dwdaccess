@@ -13,12 +13,12 @@ availability of weather data in Germany. A few initial efforts are shown
 below.
 
 > This site is not intended to share my code - mostly written in
-> *python*, *mySQL*, and *R* - to operate my weather station, and to
-> save my data on a self-hosted server. At least for the moment.
+> *python*, *R*, (and *mySQL*) - to operate my weather station and to
+> store the data on a self-hosted server. At least for the moment.
 
 ## Data
 
-As of October 13, 2023, the weather and climate data for Germany can be
+As of October 16, 2023, the weather and climate data for Germany can be
 found at the [open data
 server](https://opendata.dwd.de/climate_environment/CDC/) provided by
 [“Deutscher Wetterdienst”](https://www.dwd.de/EN/Home/home_node.html),
@@ -31,7 +31,7 @@ a friend at a lake on a hot summer day in August 2023.
 
 > There exist other *R* packages to handle data from DWD like
 > [“rdwd”](https://bookdown.org/brry/rdwd/). Those are beyond the scope
-> \> of this project.
+> of this project.
 
 ## Installation
 
@@ -77,7 +77,8 @@ leaflet() |>
 
 > The output from the *code chunk* above cannot be presented on Github,
 > since support for *java*-driven applications like *leaflet* is still
-> missing. Come back later to see an update.
+> missing. Come back later to see an update. I reommended to play around
+> with the `address_to_lonlat()`.
 
 Besides the location of interest, we need the locations of all weather
 stations operated and affiliated by DWD to identify relevant stations
@@ -474,9 +475,11 @@ For the given span of years, the total amount of days per year falling
 into each day category can be visualised as follows:
 
 ``` r
-library(sysfonts); library(showtext); library(ggplot2)
-font_add_google("Fuzzy Bubbles")
+library(sysfonts); library(ggplot2)
+library(showtext)
+if(!("Informal" %in% font_families())) font_add_google("Fuzzy Bubbles", "Informal")
 showtext_auto()
+rm(example1)
 
 example2 <- data |>
   mutate(year = lubridate::year(datetime),
@@ -526,6 +529,10 @@ example2 |>
 ```
 
 <img src="man/figures/figures-1.png" style="display: block; margin: auto;" />
+
+``` r
+rm(example2)
+```
 
 > Note, years with missing data cause white space inside the figures.
 
@@ -699,6 +706,7 @@ y <- data |>
 xy <- data.table::merge.data.table(x = x[, -"quality8"], 
                                    y = y[, c("datetime", "temperature", "humidity")], 
                                    by = "datetime")
+rm(x, y)
 ```
 
 Build a plot with two y-axes. Left: *monthly amount of rainfall*; right:
@@ -744,7 +752,7 @@ climograph_data |>
 > to `theme()`, this line is currently not used to style the figures
 > with a fancy font.
 
-## Example *Rare Events* - Diggging into *Extreme Value Theory*
+## Example: *Rare Events* - Diggging into *Extreme Value Theory*
 
 Some days ago, I read on <https://stackoverflow.com/questions/tagged/r>
 about the *Gompertz* distribution and later that day about *extreme
@@ -755,6 +763,7 @@ distribution*](https://en.wikipedia.org/wiki/Gumbel_distribution). Here
 is the plot generating code I came up with.
 
 ``` r
+par(family = "serif")
 # Gumpel, cumulative distribution function (cdf) 
 dgumpel <- function(x, mu, beta) {
   # mu = location; beta = scale 
@@ -790,9 +799,10 @@ invisible(x =
 axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2)
 axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE)
 legend(x = "bottomright", 
-       legend = unlist(lapply(X = 1L:nrow(param_combinations), FUN = \(j) 
-                              paste0("F(x, mu=", param_combinations[j, "mu"],
-                                     ", beta=", param_combinations[j, "beta"], ")")
+       legend = unlist(lapply(X = 1L:nrow(param_combinations), 
+                              FUN = \(j) 
+                              bquote("F(x, " * mu *"="*.(param_combinations[j, "mu"]) 
+                                     * "," ~ beta *"="* .(param_combinations[j, "beta"]) * ")")
                               )
                        ),
        col = colours, lwd = 2L, bty = "n")
@@ -824,12 +834,11 @@ We get $29$ records, one for each year in $1995-2023$. You may want to
 copy the data to clipboard.
 
 ``` r
-data <- structure(
-  list(
-    year = c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 
+amodr_data <- structure(
+  list(year = c(1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 
              2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 
              2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023), 
-    amodr = c(19.5, 17, 36.1, 32.3, 19.8, 31.9, 22, 
+       amodr = c(19.5, 17, 36.1, 32.3, 19.8, 31.9, 22, 
               86.7, 16.5, 26.9, 36.4, 54.6, 36.9, 28.5, 
               23.7, 32.6, 44.8, 54.3, 40.9, 56.5, 45.9, 
               23.3, 65.2, 32.4, 63.3, 23.8, 53, 33, 47.8)), 
@@ -842,25 +851,44 @@ data <- structure(
 First, we calculate and plot the *empirical cumulative distribution
 function* (ecdf), a step function by its very definition. Second, we use
 `EnvStats::eevd()` to execute a *maximum likelihood estimation* (MLE) of
-the parameters, see the help page for details. We, then, add the
-*estimated cumulative distribution function* to the plot. Finally, we
-extend by $95%$-confidence bands.
+the parameters, see the help page for details. We, then, add a *Gumpel
+cdf* with the *estimates* of $\hat{\mu} = 30.64$ and
+$\hat{\beta} = 12.46$ to the plot. Finally, we extend by $95%$-CI bands,
+$\hat{\mu} \in [25.65, 35.63]$.
 
 ``` r
-# annual maximum one-day rainfall
-plot(x = ecdf(data$amodr), 
-     verticals = TRUE, 
-     main = paste0(
-       "Empirical Cumulative Distribution Function\n of annual maximal one-day rainfall\n in Potsdam, ", min(data$year), "-", max(data$year))
+par(mfrow = c(1L, 2L), family = "Informal") # nrow x ncol 
+
+library(RColorBrewer)
+pal <- colorRampPalette(brewer.pal(10L, "Blues"))
+
+with(data = amodr_data, 
+     expr = {
+       ord = findInterval(amodr, sort(amodr))
+       # annual maximum one-day rainfall
+       plot(x = year, y = amodr, col = pal(length(amodr))[ord],
+            xaxt = "n", ylab = "rainfall [mm]", pch = 19L
+       ) 
+       axis(side = 1, at = seq(from = min(year), to = max(year), by = 2L))
+       # corresponding ecdf plot
+       plot(x = ecdf(amodr), verticals = TRUE, main = "")
+       }
      )
 ```
 
-<img src="man/figures/unnamed-chunk-11-1.png" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+
+<img src="man/figures/unnamed-chunk-11-1.png" alt="Scatterplot and ecdf of annual maximal one-day rainfall in Potsdam"  />
+<p class="caption">
+Scatterplot and ecdf of annual maximal one-day rainfall in Potsdam
+</p>
+
+</div>
 
 ``` r
 # install.packages("EnvStats")
 library(EnvStats)
-(mle <-  eevd(x = data$amodr, method = "mle", ci = TRUE))
+(mle <-  EnvStats::eevd(x = amodr_data$amodr, method = "mle", ci = TRUE))
 ```
 
     ## 
@@ -874,7 +902,7 @@ library(EnvStats)
     ## 
     ## Estimation Method:               mle
     ## 
-    ## Data:                            data$amodr
+    ## Data:                            amodr_data$amodr
     ## 
     ## Sample Size:                     29
     ## 
@@ -891,51 +919,56 @@ library(EnvStats)
     ##                                  UCL = 35.63013
 
 ``` r
+plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "", family = "Fuzzy Bubbles")
+
 curve(expr = dgumpel(x = x,
                      mu = mle$parameters[[1L]],
                      beta = mle$parameters[[2L]]), 
-      col = "blue", 
+      col = "black", lwd = 2L,
       add = TRUE
       )
-```
 
-<img src="man/figures/unnamed-chunk-11-2.png" style="display: block; margin: auto;" />
-
-``` r
-# add CI w.r.t. shape parameter (mu)
+# add CI w.r.t. shape parameter ($\mu$)
 invisible(x = lapply( # prevents cluttered console 
   X = mle[["interval"]][["limits"]], 
   FUN = \(i) curve(expr = dgumpel(x = x, 
                                   mu = i,
                                   beta = mle$parameters[[2L]]), 
+                   col = "black", lty = 2L,
                    add = TRUE, 
-                   col = "blue", 
-                   lty = 2L
                    )
   )
 )
+legend(x = "bottomright", 
+       legend = c(bquote("dgumpel(" * hat(mu) *  "," ~ hat(beta) * ")" ), 
+                  "95-CI bands"), # of" ~ hat(mu)
+       col = "black", lwd = c(2L, 1L), lty = c(1L, 2L)
+       )
 ```
 
-<img src="man/figures/unnamed-chunk-11-3.png" style="display: block; margin: auto;" />
+<img src="man/figures/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
 
-**I will add all statistical details with a future version.**
+**I will add statistical details with a future version.**
 
 There exist several concepts to visually compare an *empirical
-cumulative distribution function* with it’s theoretical counterpart. In
-the following, we create a so-called *P-P plot* (p $=$ probability):
+cumulative distribution function* to its assumed theoretical
+counterpart. In the following, we create a so-called *P-P plot* (p $=$
+probability):
 
 ``` r
-plot(y = ecdf(amodr_data$amodr)(amodr_data$amodr),
-     x = dgumpel(x = amodr_data$amodr,
-        mu = mle$parameters[[1L]],
-        beta = mle$parameters[[2L]]), 
-     main = "Probability-Probability Plot",
-     xlab = "theoretical", ylab = "empirical", 
+par(family = "Informal")
+with(data = amodr_data, 
+     expr = plot(y = ecdf(amodr)(amodr),
+                 x = dgumpel(x = amodr,
+                 mu = mle$parameters[[1L]],
+                 beta = mle$parameters[[2L]]), 
+                 main = "Probability-Probability Plot",
+                 xlab = "mle estimate", ylab = "empirical")
      )
 abline(a = 0, b = 1)
 ```
 
-<img src="man/figures/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/unnamed-chunk-13-1.png" style="display: block; margin: auto;" />
 
 Application/interpretation of *P-P plots* is vague, especially if theory
 is compared to real data.
