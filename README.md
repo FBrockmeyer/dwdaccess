@@ -763,7 +763,6 @@ distribution*](https://en.wikipedia.org/wiki/Gumbel_distribution). Here
 is the plot generating code I came up with.
 
 ``` r
-par(family = "serif")
 # Gumpel, cumulative distribution function (cdf) 
 dgumpel <- function(x, mu, beta) {
   # mu = location; beta = scale 
@@ -792,13 +791,14 @@ invisible(x =
                                   xlab = "", ylab = "", yaxt = "n",
                                   main = substitute(paste(bold("Cumulative Distribution Function"))),
                                   # reduce box margins around limits 
-                                  xaxs = "i", yaxs  ="i")
+                                  xaxs = "i", yaxs  ="i",
+                                  family = "Informal")
                      )
                    )
           )
-axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2)
-axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE)
-legend(x = "bottomright", 
+axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2, family = "Informal")
+axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE, family = "Informal")
+legend(x = 6, y = .5, 
        legend = unlist(lapply(X = 1L:nrow(param_combinations), 
                               FUN = \(j) 
                               bquote("F(x, " * mu *"="*.(param_combinations[j, "mu"]) 
@@ -869,7 +869,7 @@ with(data = amodr_data,
        plot(x = year, y = amodr, col = pal(length(amodr))[ord],
             xaxt = "n", ylab = "rainfall [mm]", pch = 19L
        ) 
-       axis(side = 1, at = seq(from = min(year), to = max(year), by = 2L))
+       axis(side = 1, at = seq(from = min(year), to = max(year), by = 2L), las = 3L)
        # corresponding ecdf plot
        plot(x = ecdf(amodr), verticals = TRUE, main = "")
        }
@@ -919,7 +919,7 @@ library(EnvStats)
     ##                                  UCL = 35.63013
 
 ``` r
-plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "", family = "Fuzzy Bubbles")
+plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "", family = "Informal")
 
 curve(expr = dgumpel(x = x,
                      mu = mle$parameters[[1L]],
@@ -956,14 +956,13 @@ counterpart. In the following, we create a so-called *P-P plot* (p $=$
 probability):
 
 ``` r
-par(family = "Informal")
 with(data = amodr_data, 
      expr = plot(y = ecdf(amodr)(amodr),
                  x = dgumpel(x = amodr,
                  mu = mle$parameters[[1L]],
                  beta = mle$parameters[[2L]]), 
                  main = "Probability-Probability Plot",
-                 xlab = "mle estimate", ylab = "empirical")
+                 xlab = bquote(" values from dgumpel(" * hat(mu) *  "," ~ hat(beta) * ")"), ylab = "empirical")
      )
 abline(a = 0, b = 1)
 ```
