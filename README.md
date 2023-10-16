@@ -791,8 +791,7 @@ invisible(x =
                                   xlab = "", ylab = "", yaxt = "n",
                                   main = substitute(paste(bold("Cumulative Distribution Function"))),
                                   # reduce box margins around limits 
-                                  xaxs = "i", yaxs  ="i",
-                                  family = "Informal")
+                                  xaxs = "i", yaxs  ="i")
                      )
                    )
           )
@@ -857,7 +856,7 @@ $\hat{\beta} = 12.46$ to the plot. Finally, we extend by $95%$-CI bands,
 $\hat{\mu} \in [25.65, 35.63]$.
 
 ``` r
-par(mfrow = c(1L, 2L), family = "Informal") # nrow x ncol 
+par(mfrow = c(1L, 2L)) # nrow x ncol 
 
 library(RColorBrewer)
 pal <- colorRampPalette(brewer.pal(10L, "Blues"))
@@ -919,7 +918,7 @@ library(EnvStats)
     ##                                  UCL = 35.63013
 
 ``` r
-plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "", family = "Informal")
+plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "")
 
 curve(expr = dgumpel(x = x,
                      mu = mle$parameters[[1L]],

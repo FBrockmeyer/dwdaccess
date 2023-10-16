@@ -542,8 +542,7 @@ invisible(x =
                                   xlab = "", ylab = "", yaxt = "n",
                                   main = substitute(paste(bold("Cumulative Distribution Function"))),
                                   # reduce box margins around limits 
-                                  xaxs = "i", yaxs  ="i",
-                                  family = "Informal")
+                                  xaxs = "i", yaxs  ="i")
                      )
                    )
           )
@@ -593,7 +592,7 @@ amodr_data <- structure(
 First, we calculate and plot the *empirical cumulative distribution function* (ecdf), a step function by its very definition. Second, we use `EnvStats::eevd()` to execute a *maximum likelihood estimation* (MLE) of the parameters, see the help page for details. We, then, add a *Gumpel cdf* with the *estimates* of $\hat{\mu} = 30.64$ and $\hat{\beta} = 12.46$ to the plot. Finally, we extend by $95%$-CI bands, $\hat{\mu} \in [25.65, 35.63]$.
 
 ```{r, fig.cap = "Scatterplot and ecdf of annual maximal one-day rainfall in Potsdam"}
-par(mfrow = c(1L, 2L), family = "Informal") # nrow x ncol 
+par(mfrow = c(1L, 2L)) # nrow x ncol 
 
 library(RColorBrewer)
 pal <- colorRampPalette(brewer.pal(10L, "Blues"))
@@ -616,7 +615,7 @@ with(data = amodr_data,
 # install.packages("EnvStats")
 library(EnvStats)
 (mle <-  EnvStats::eevd(x = amodr_data$amodr, method = "mle", ci = TRUE))
-plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "", family = "Informal")
+plot(x = ecdf(amodr_data$amodr), verticals = TRUE, main = "")
 
 curve(expr = dgumpel(x = x,
                      mu = mle$parameters[[1L]],
