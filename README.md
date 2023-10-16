@@ -796,8 +796,8 @@ invisible(x =
                      )
                    )
           )
-axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2, family = "Informal")
-axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE, family = "Informal")
+axis(side = 2L, at = seq(0L, 1L, by = .1), las = 2)
+axis(side = 3L, labels = FALSE); axis(side = 4L, at = seq(0L, 1L, by = .1), labels = FALSE)
 legend(x = 6, y = .5, 
        legend = unlist(lapply(X = 1L:nrow(param_combinations), 
                               FUN = \(j) 
